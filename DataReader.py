@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
+import nltk
+from sklearn.linear_model import LogisticRegression
 
 
 # For now this isn't the best name overall, as we might include more datasets later on
@@ -28,12 +30,16 @@ def split_sheet_into_test_training_per_word(sheet=None, split=0.25):
     y_train_set = pd.DataFrame()
     y_test_set = pd.DataFrame()
 
+    # Forgot to tokenize beforehand, doing it now
+    sheet["line"] = sheet.apply(lambda row: nltk.word_tokenize(row["line"]), axis=1)
+
     # Each subset created will only care about those sentences were there's agreement on the definition
     # This is just the starting method, this will most definitely eliminate too much data
     # But for now it's good enough
     for word in unique_words:
         subset = sheet[sheet["probe"] == word]
         subset = subset[subset["CertainOrUncertainAgreement_R1_R2"] != 0]
+
         train, test = train_test_split(subset, test_size=split)
 
         x_test = test[["probe","line"]]
@@ -50,6 +56,8 @@ def split_sheet_into_test_training_per_word(sheet=None, split=0.25):
         y_test_set = pd.concat([y_test_set, y_test])
         y_train_set = pd.concat([y_train_set, y_train])
 
+    y_test_set = y_test_set.astype("str")
+    y_train_set = y_train_set.astype("str")
     return x_test_set, x_train_set, y_test_set, y_train_set
 
 # The difference in this method vs default is that we no longer train on the original word
