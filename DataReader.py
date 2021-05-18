@@ -51,3 +51,59 @@ def split_sheet_into_test_training_per_word(sheet=None, split=0.25):
         y_train_set = pd.concat([y_train_set, y_train])
 
     return x_test_set, x_train_set, y_test_set, y_train_set
+
+# The difference in this method vs default is that we no longer train on the original word
+# We train on word1, word2, so it's a slightly modified version of the word
+# There are definitely arguments that this might be too nice, but it can still be used
+
+# The idea of simplified is that if true it'll return the sentence as x
+# and then the word that needs to be predicted as y
+# This needs to be modified somehow depending on what approach is gonna be taken
+# For example sometimes it might be worth it to hide what the correct word is
+# But screw it, this works
+# One thing of note is that this makes it so that the test set has the correct answer in the sentence
+# Might change it later to work properly
+def create_test_training_data_with_modified_words(sheet=None, split=0.25, simplified = True):
+    if sheet is None:
+        sheet = read_starting_dataset()
+
+    x_test_set, x_train_set, y_test_set, y_train_set = split_sheet_into_test_training_per_word(sheet=sheet, split=split)
+
+    x_test_set["probe"] = x_test_set["probe"] + y_test_set.to_string()
+    x_train_set["probe"] = x_train_set["probe"] + y_train_set.to_string()
+
+    for row in x_test_set.iterrows():
+        sentence = row["line"]
+        # I just want to ignore the last character
+        mod_word = row["probe"]
+        orig_word = mod_word[:-1]
+
+        # The only way I can think of is by going through each word in the sentence
+        for word in sentence:
+            if word == orig_word:
+                # I'm not completely sure if this'll modify the original version as well
+                # I'll bug test this later
+                word = mod_word
+
+    for row in x_train_set.iterrows():
+        sentence = row["line"]
+        # I just want to ignore the last character
+        mod_word = row["probe"]
+        orig_word = mod_word[:-1]
+
+        # The only way I can think of is by going through each word in the sentence
+        for word in sentence:
+            if word == orig_word:
+                word = mod_word
+
+    # What this block does in a nutshell is just make it so that the test set are the sentences with the homogram
+    # And the y set are the word that's being looked for
+    # As mentioned in the start, this makes it so that the test and train set contain the actual word
+    # Which is kinda shitty, but how to fix it depends greatly on what approach will be done
+    if simplified:
+        y_test_set = x_test_set["probe"]
+        y_train_set = x_train_set["probe"]
+        x_test_set = x_test_set["line"]
+        x_train_set = x_train_set["line"]
+
+    return x_test_set, x_train_set, y_test_set, y_train_set
