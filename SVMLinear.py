@@ -34,17 +34,17 @@ if __name__ == '__main__':
         else:
             break
 
-    nlp = spacy.load('en_core_web_lg')
+    nlp = spacy.load('en_core_web_sm')
     x_train_refined = []
     all_stopwords = nlp.Defaults.stop_words
-    for sent in x_train_pra:
+    for index,sent in x_train_pra.iterrows():
         text_tokens = nlp(sent)
         #     text_tokens = word_tokenize(text)
         tokens_without_sw = [word for word in text_tokens if not word in all_stopwords]
         x_train_refined.append(tokens_without_sw)
 
     x_test_refined = []
-    for sent in x_test_pra:
+    for index,sent in x_test_pra.iterrows():
         test_tokens = nlp(sent)
         test_tokens_without_sw = [word for word in test_tokens if not word in all_stopwords]
         x_test_refined.append(test_tokens_without_sw)
