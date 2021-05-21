@@ -7,55 +7,6 @@ from sklearn.metrics import accuracy_score
 from sklearn import datasets
 from sklearn.model_selection import GridSearchCV
 
-# class SVM:
-#
-#     def __init__(self):
-#         self.model = svm.SVC()
-#
-#     def createFeatures(self):
-#
-#         x_test, x_train, y_test, y_train = split_sheet_into_test_training_per_word()
-#
-#         x_train_pra = []
-#         x_test_pra = []
-#         for index, row in x_train.iterrows():
-#             if row["probe"] == x_train["probe"].unique()[0]:
-#                 x_train_pra.append(row["line"])
-#             else:
-#                 break
-#
-#         for word in x_test["probe"]:
-#             if word == x_test["probe"].unique()[0]:
-#                 x_test_pra.append(x_test["line"])
-#
-#         for index, row in x_test.iterrows():
-#             if row["probe"] == x_test["probe"].unique()[0]:
-#                 x_test_pra.append(row["line"])
-#             else:
-#                 break
-#
-#         nlp = spacy.load('en_core_web_lg')
-#         x_train_refined = []
-#         all_stopwords = nlp.Defaults.stop_words
-#         for sent in x_train_pra:
-#             text_tokens = nlp(sent)
-#             #     text_tokens = word_tokenize(text)
-#             tokens_without_sw = [word for word in text_tokens if not word in all_stopwords]
-#             x_train_refined.append(tokens_without_sw)
-#
-#
-#
-#         param_grid = {'C': [0.1, 1, 5, 10, 20, 30, 40, 50, 60, 70, 100, 200],
-#                            'gamma': [1, 0.1, 0.01, 0.001],
-#                            'kernel': ['rbf', 'poly', 'sigmoid']}
-#         grid = GridSearchCV(model, param_grid, refit=True)
-#         grid.fit(x_train_refined, y_train)
-#
-#         print(grid.best_params_)
-#
-#         predictions = grid.predict(feature_test)
-#         print(confusion_matrix(target_test, predictions))
-#         print(accuracy_score(target_test, predictions))
 
 if __name__ == '__main__':
 
@@ -87,17 +38,22 @@ if __name__ == '__main__':
     nlp = spacy.load('en_core_web_lg')
     x_train_refined = []
     all_stopwords = nlp.Defaults.stop_words
-    for index,sent in x_train_pra.iterrows():
-        text_tokens = nlp(sent)
-        #     text_tokens = word_tokenize(text)
-        tokens_without_sw = [word for word in text_tokens if not word in all_stopwords]
-        x_train_refined.append(tokens_without_sw)
+    for sent in x_train_pra:
+        sentence = ""
+        tokens_without_sw = [word for word in sent if not word in all_stopwords]
+        for item in tokens_without_sw:
+            sentence = sentence + " " + item
+        x_train_refined.append(sentence)
+
+    print(x_train_refined)
 
     x_test_refined = []
-    for index,sent in x_test_pra.iterrows():
-        test_tokens = nlp(sent)
-        test_tokens_without_sw = [word for word in test_tokens if not word in all_stopwords]
-        x_test_refined.append(test_tokens_without_sw)
+    for sent in x_test_pra:
+        sentence = ""
+        test_tokens_without_sw = [word for word in sent if not word in all_stopwords]
+        for item in test_tokens_without_sw:
+            sentence = sentence + " " + item
+        x_test_refined.append(sentence)
 
     param_grid = {'C': [0.1, 1, 5, 10, 20, 30, 40, 50, 60, 70, 100, 200],
                   'gamma': [1, 0.1, 0.01, 0.001],
