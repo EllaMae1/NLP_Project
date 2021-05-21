@@ -8,7 +8,7 @@ from sklearn.linear_model import LogisticRegression
 # For now this isn't the best name overall, as we might include more datasets later on
 # But for now it's a perfectly valid starting point, so we'll use it
 def read_starting_dataset():
-    sheet = pd.read_excel("Data/Riceetal_SupplementaryMaterials_R1.xlsx", sheet_name="SUBTL")
+    sheet = pd.read_excel("Data/Riceetal_SupplementaryMaterials_R1.xlsx", sheet_name="SUBTL",engine='openpyxl')
 
     return sheet
 

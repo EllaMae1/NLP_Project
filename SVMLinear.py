@@ -53,8 +53,10 @@ if __name__ == '__main__':
             for item in test_tokens_without_sw:
                 sentence = sentence + " " + item
             x_test_refined.append(sentence)
+
         print(y_train_pra)
         first = y_train_pra[0]
+        # first = '1'
         check = False
         for j in range(1, len(y_train_pra)):
             temp = y_train_pra[j]
@@ -64,6 +66,8 @@ if __name__ == '__main__':
 
         # if not check:
         #     accuracies.append(1)
+        print(check)
+        print(accuracies)
         if check:
             vectorizer = TfidfVectorizer()
 
