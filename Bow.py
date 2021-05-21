@@ -17,7 +17,7 @@ class Bow():
                     for i in range(4):
                         if w in self.bow[row['probe']][i]:
                             score_line[i]+=1                
-            if sum(score_line)==0:
+            if sum(score_line)==0 or score_line.count(max(score_line))>1:
                 noidea +=1
             elif (str)(score_line.index(max(score_line))+1) == y_test.loc[index][0]:
                 correct+=1
