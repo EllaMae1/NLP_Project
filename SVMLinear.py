@@ -18,24 +18,23 @@ if __name__ == '__main__':
     words = x_train["probe"].unique()
     accuracies = []
     i = 0
-    while i <= len(words):
+    for elem in words:
         x_train_pra = []
         x_test_pra = []
         y_train_pra = []
         y_test_pra = []
         for index, row in x_train.iterrows():
-            if row["probe"] == x_train["probe"].unique()[i]:
+            tmp = row["probe"]
+            if row["probe"] == elem:
                 x_train_pra.append(row["line"])
-                y_train_pra.append(y_train[0][index])
-            else:
-                break
+                y_train_pra.append(y_train.iloc[index][0])
 
         for index, row in x_test.iterrows():
-            if row["probe"] == x_test["probe"].unique()[i]:
+            tmp = row["probe"]
+            if row["probe"] == elem:
                 x_test_pra.append(row["line"])
-                y_test_pra.append(y_test[0][index])
-            else:
-                break
+                y_test_pra.append(y_test.iloc[index][0])
+
 
         nlp = spacy.load('en_core_web_sm')
         x_train_refined = []
@@ -58,8 +57,10 @@ if __name__ == '__main__':
         first = y_train_pra[0]
         check = False
         for j in range(1, len(y_train_pra)):
-            if y_train_pra[j] != first:
+            temp = y_train_pra[j]
+            if temp != first:
                 check = True
+                break
 
         # if not check:
         #     accuracies.append(1)
