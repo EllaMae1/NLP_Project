@@ -16,22 +16,9 @@ if __name__ == '__main__':
     x_test, x_train, y_test, y_train = split_sheet_into_test_training_per_word()
 
     words = x_train["probe"].unique()
-    word_set1 = words[:120]
-    word_set2 = words[120:220]
-    word_set3 = words[220:320]
-    word_set4 = words[320:420]
-    word_set5 = words[420:530]
 
     accuracies = []
 
-    for index, row in x_test.iterrows():
-        tmp = row["probe"]
-        if row["probe"] == 'pump':
-            # x_test_pra.append(row["line"])
-            print(index)
-            print(row["line"])
-            print(y_test.iloc[index][0])
-            # y_test_pra.append(y_test.iloc[index][0])
 
     for elem in words:
         # if elem in ['pump', 'mid']:
@@ -45,16 +32,13 @@ if __name__ == '__main__':
             tmp = row["probe"]
             if row["probe"] == elem:
                 x_train_pra.append(row["line"])
-                y_train_pra.append(y_train.iloc[index][0])
+                y_train_pra.append(y_train.loc[index][0])
 
         for index, row in x_test.iterrows():
             tmp = row["probe"]
             if row["probe"] == elem:
                 x_test_pra.append(row["line"])
-                print(index)
-                print(row["line"])
-                print(y_test.iloc[index][0])
-                y_test_pra.append(y_test.iloc[index][0])
+                y_test_pra.append(y_test.loc[index][0])
 
         nlp = spacy.load('en_core_web_sm')
         x_train_refined = []
@@ -97,10 +81,10 @@ if __name__ == '__main__':
             text_clf.fit(x_train_refined, y_train_pra)
             predictions = text_clf.predict(x_test_refined)
 
-            # print(confusion_matrix(y_test_pra, predictions))
-            # print(accuracy_score(y_test_pra, predictions))
+            print(confusion_matrix(y_test_pra, predictions))
+            print(accuracy_score(y_test_pra, predictions))
             accuracies.append(accuracy_score(y_test_pra, predictions))
-            # print(classification_report(y_test_pra, predictions))
-            # print(len(accuracies))
+            print(classification_report(y_test_pra, predictions))
+            print(len(accuracies))
 
     print(np.mean(accuracies))
