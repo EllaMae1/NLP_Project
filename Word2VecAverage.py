@@ -11,7 +11,7 @@ class Word2VecAverage:
 
     def train_word2vec(self, data=None):
         if data is None:
-            self.model = gensim.downloader.load("glove-wiki-gigaword-100")
+            self.model = gensim.downloader.load("glove-wiki-gigaword-50")
             # self.word_vectors = self.model.wv
             return
 

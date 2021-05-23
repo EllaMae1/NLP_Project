@@ -124,4 +124,4 @@ def create_test_training_data_with_modified_words(sheet=None, split=0.25, simpli
 
 
 if __name__ == "__main__":
-    split_sheet_into_test_training_per_word()
+    x_test_set, x_train_set, y_test_set, y_train_set = split_sheet_into_test_training_per_word()
