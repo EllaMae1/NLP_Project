@@ -8,13 +8,14 @@ from sklearn.linear_model import LogisticRegression
 # For now this isn't the best name overall, as we might include more datasets later on
 # But for now it's a perfectly valid starting point, so we'll use it
 def read_starting_dataset():
-    sheet = pd.read_excel("Data/Riceetal_SupplementaryMaterials_R1.xlsx", sheet_name="SUBTL",engine='openpyxl')
+    sheet = pd.read_excel("Data/Riceetal_SupplementaryMaterials_R1.xlsx", sheet_name="SUBTL", engine='openpyxl')
 
     return sheet
 
 
 """Idea of this method is that for each unique word, it'll find a test train split for it
 This created split is what will be used later for the training"""
+
 
 # Split is how many are used for training, and how many are used for testing
 # Where the percentage less than split represents the test values
@@ -40,10 +41,14 @@ def split_sheet_into_test_training_per_word(sheet=None, split=0.25):
         subset = sheet[sheet["probe"] == word]
         subset = subset[subset["CertainOrUncertainAgreement_R1_R2"] != 0]
 
+        unique_definitions = subset["Meaning_R1_BestGuess"].unique()
+        if len(unique_definitions) < 2:
+            continue
+
         train, test = train_test_split(subset, test_size=split)
 
-        x_test = test[["probe","line"]]
-        x_train = train[["probe","line"]]
+        x_test = test[["probe", "line"]]
+        x_train = train[["probe", "line"]]
 
         # In this case, because we're taking it for granted that the two words have the same rating
         # We will just take the meaning given by R1
@@ -60,6 +65,7 @@ def split_sheet_into_test_training_per_word(sheet=None, split=0.25):
     y_train_set = y_train_set.astype("str")
     return x_test_set, x_train_set, y_test_set, y_train_set
 
+
 # The difference in this method vs default is that we no longer train on the original word
 # We train on word1, word2, so it's a slightly modified version of the word
 # There are definitely arguments that this might be too nice, but it can still be used
@@ -71,7 +77,7 @@ def split_sheet_into_test_training_per_word(sheet=None, split=0.25):
 # But screw it, this works
 # One thing of note is that this makes it so that the test set has the correct answer in the sentence
 # Might change it later to work properly
-def create_test_training_data_with_modified_words(sheet=None, split=0.25, simplified = True):
+def create_test_training_data_with_modified_words(sheet=None, split=0.25, simplified=True):
     if sheet is None:
         sheet = read_starting_dataset()
 
@@ -115,3 +121,7 @@ def create_test_training_data_with_modified_words(sheet=None, split=0.25, simpli
         x_train_set = x_train_set["line"]
 
     return x_test_set, x_train_set, y_test_set, y_train_set
+
+
+if __name__ == "__main__":
+    split_sheet_into_test_training_per_word()
