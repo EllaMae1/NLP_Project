@@ -1,9 +1,11 @@
+import pandas as pd
 from DataReader import split_sheet_into_test_training_per_word
 import numpy as np
 import spacy
 from sklearn import svm
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, classification_report
+from sklearn.metrics import precision_recall_fscore_support as score
 from sklearn.metrics import accuracy_score
 from sklearn import datasets
 from sklearn.model_selection import GridSearchCV
@@ -18,16 +20,17 @@ if __name__ == '__main__':
     words = x_train["probe"].unique()
 
     accuracies = []
-
+    precisions = []
+    recalls = []
+    fscores = []
+    classification_reports = {'Accuracy':0,'Precision':0,'Recall':0,'fscore':0}
 
     for elem in words:
-        # if elem in ['pump', 'mid']:
-        #     continue
+
         x_train_pra = []
         x_test_pra = []
         y_train_pra = []
         y_test_pra = []
-        print(elem)
         for index, row in x_train.iterrows():
             tmp = row["probe"]
             if row["probe"] == elem:
@@ -81,10 +84,22 @@ if __name__ == '__main__':
             text_clf.fit(x_train_refined, y_train_pra)
             predictions = text_clf.predict(x_test_refined)
 
-            print(confusion_matrix(y_test_pra, predictions))
+            # print(confusion_matrix(y_test_pra, predictions))
             print(accuracy_score(y_test_pra, predictions))
             accuracies.append(accuracy_score(y_test_pra, predictions))
-            print(classification_report(y_test_pra, predictions))
-            print(len(accuracies))
+            # print(classification_report(y_test_pra, predictions))
+            report = classification_report(y_test_pra, predictions, output_dict=True)
+            # print(report)
+            precision, recall, fscore, support = score(y_test_pra, predictions,average='macro')
+            precisions.append(precision)
+            recalls.append(recall)
+            fscores.append(fscore)
 
-    print(np.mean(accuracies))
+    classification_reports['Precision'] = np.mean(precisions)
+    classification_reports['Accuracy'] = np.mean(accuracies)
+    classification_reports['Recall'] = np.mean(recalls)
+    classification_reports['fscore'] = np.mean(fscores)
+    print(classification_reports)
+    # df = pd.DataFrame(classification_reports).transpose()
+    # df.to_csv('report.csv')
+
