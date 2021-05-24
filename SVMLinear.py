@@ -20,17 +20,21 @@ if __name__ == '__main__':
 
     words = x_train["probe"].unique()
 
-    accuracies = []
-    precisions = []
-    recalls = []
-    fscores = []
-    classification_reports = {'1': {'precision': 0, 'recall': 0, 'f1-score': 0, 'support': 1},
-                              '2': {'precision': 0, 'recall': 0, 'f1-score': 0, 'support': 1},
-                              '3': {'precision': 0, 'recall': 0, 'f1-score': 0, 'support': 1},
-                              '4': {'precision': 0, 'recall': 0, 'f1-score': 0, 'support': 1},
-                              'accuracy': 0,
-                              'macro avg': {'precision': 0, 'recall': 0, 'f1-score': 0, 'support': 1},
-                              'weighted avg': {'precision': 0, 'recall': 0, 'f1-score': 0, 'support': 1}}
+    classification_reports = {'1': {'precision': [], 'recall': [], 'f1-score': [], 'support': 0},
+                              '2': {'precision': [], 'recall': [], 'f1-score': [], 'support': 0},
+                              '3': {'precision': [], 'recall': [], 'f1-score': [], 'support': 0},
+                              '4': {'precision': [], 'recall': [], 'f1-score': [], 'support': 0},
+                              'accuracy': [],
+                              'macro avg': {'precision': [], 'recall': [], 'f1-score': [], 'support': 0},
+                              'weighted avg': {'precision': [], 'recall': [], 'f1-score': [], 'support': 0}}
+
+    classification = {'1': {'precision': 0, 'recall': 0, 'f1-score': 0, 'support': 0},
+                      '2': {'precision': 0, 'recall': 0, 'f1-score': 0, 'support': 0},
+                      '3': {'precision': 0, 'recall': 0, 'f1-score': 0, 'support': 0},
+                      '4': {'precision': 0, 'recall': 0, 'f1-score': 0, 'support': 0},
+                      'accuracy': 0,
+                      'macro avg': {'precision': 0, 'recall': 0, 'f1-score': 0, 'support': 0},
+                      'weighted avg': {'precision': 0, 'recall': 0, 'f1-score': 0, 'support': 0}}
 
     for elem in words:
 
@@ -76,8 +80,6 @@ if __name__ == '__main__':
                 check = True
                 break
 
-        if not check:
-            accuracies.append(1)
         if check:
             vectorizer = TfidfVectorizer()
 
@@ -86,37 +88,34 @@ if __name__ == '__main__':
             clf.fit(X_train_tfidf, y_train_pra)
 
             text_clf = Pipeline([('tfidf', TfidfVectorizer()),
-                                 ('clf', LinearSVC())])
+                             ('clf', LinearSVC())])
 
             text_clf.fit(x_train_refined, y_train_pra)
             predictions = text_clf.predict(x_test_refined)
 
-            # print(confusion_matrix(y_test_pra, predictions))
+        # print(confusion_matrix(y_test_pra, predictions))
             print(accuracy_score(y_test_pra, predictions))
-            accuracies.append(accuracy_score(y_test_pra, predictions))
-            # print(classification_report(y_test_pra, predictions))
+        # accuracies.append(accuracy_score(y_test_pra, predictions))
+        # print(classification_report(y_test_pra, predictions))
             report = classification_report(y_test_pra, predictions, output_dict=True)
             print(report)
             for key in report.keys():
                 if key == 'accuracy':
-                    classification_reports['accuracy'] = (classification_reports['accuracy'] + report[key]) / 2
+                    classification_reports['accuracy'] .append(report[key])
                 else:
-                    classification_reports[key]['precision'] = (classification_reports[key]['precision'] +
-                                                                report[key]['precision']) / 2
-                    classification_reports[key]['recall'] = (classification_reports[key]['recall'] +
-                                                             report[key]['recall']) / 2
-                    classification_reports[key]['f1-score'] = (classification_reports[key]['f1-score'] +
-                                                               report[key]['f1-score']) / 2
+                    classification_reports[key]['precision'].append(report[key]['precision'])
+                    classification_reports[key]['recall'].append(report[key]['recall'])
+                    classification_reports[key]['f1-score'].append(report[key]['f1-score'])
                     classification_reports[key]['support'] = (classification_reports[key]['support'] +
-                                                              report[key]['support'])
+                                                          report[key]['support'])
 
-    for key in classification_reports.keys():
+    for key in classification.keys():
         if key == 'accuracy':
-            classification_reports['accuracy'] = round(classification_reports['accuracy'], 2)
+            classification['accuracy'] = np.mean(classification_reports['accuracy'])
         else:
-            classification_reports[key]['precision'] = round(classification_reports[key]['precision'], 2)
-            classification_reports[key]['recall'] = round(classification_reports[key]['recall'], 2)
-            classification_reports[key]['f1-score'] = round(classification_reports[key]['f1-score'], 2)
-            classification_reports[key]['support'] = round(classification_reports[key]['support'], 2)
-    df = pd.DataFrame(classification_reports).transpose()
+            classification[key]['precision'] = np.mean(classification_reports[key]['precision'])
+            classification[key]['recall'] = np.mean(classification_reports[key]['recall'])
+            classification[key]['f1-score'] = np.mean(classification_reports[key]['f1-score'])
+            classification[key]['support'] = classification_reports[key]['support']
+    df = pd.DataFrame(classification).transpose()
     df.to_csv('report.csv')
