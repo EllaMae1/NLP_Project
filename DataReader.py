@@ -41,6 +41,9 @@ def split_sheet_into_test_training_per_word(sheet=None, split=0.25):
         subset = sheet[sheet["probe"] == word]
         subset = subset[subset["CertainOrUncertainAgreement_R1_R2"] != 0]
 
+        subset = subset[subset["Meaning_R1_BestGuess"] != "-"]
+        subset = subset[subset["Meaning_R2_BestGuess"] != "-"]
+
         unique_definitions = subset["Meaning_R1_BestGuess"].unique()
         if len(unique_definitions) < 2:
             continue
@@ -52,6 +55,8 @@ def split_sheet_into_test_training_per_word(sheet=None, split=0.25):
 
         # In this case, because we're taking it for granted that the two words have the same rating
         # We will just take the meaning given by R1
+
+
         y_test = test["Meaning_R1_BestGuess"]
         y_train = train["Meaning_R1_BestGuess"]
 
@@ -125,3 +130,5 @@ def create_test_training_data_with_modified_words(sheet=None, split=0.25, simpli
 
 if __name__ == "__main__":
     x_test_set, x_train_set, y_test_set, y_train_set = split_sheet_into_test_training_per_word()
+    print(y_test_set.drop_duplicates())
+    print(y_train_set.drop_duplicates())
