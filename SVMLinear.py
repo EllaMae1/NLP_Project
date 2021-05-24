@@ -12,6 +12,7 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import LinearSVC
 from sklearn.pipeline import Pipeline
+from collections import Counter
 
 if __name__ == '__main__':
 
@@ -23,7 +24,13 @@ if __name__ == '__main__':
     precisions = []
     recalls = []
     fscores = []
-    classification_reports = {'Accuracy':0,'Precision':0,'Recall':0,'fscore':0}
+    classification_reports = {'1': {'precision': 0, 'recall': 0, 'f1-score': 0, 'support': 1},
+                              '2': {'precision': 0, 'recall': 0, 'f1-score': 0, 'support': 1},
+                              '3': {'precision': 0, 'recall': 0, 'f1-score': 0, 'support': 1},
+                              '4': {'precision': 0, 'recall': 0, 'f1-score': 0, 'support': 1},
+                              'accuracy': 0,
+                              'macro avg': {'precision': 0, 'recall': 0, 'f1-score': 0, 'support': 1},
+                              'weighted avg': {'precision': 0, 'recall': 0, 'f1-score': 0, 'support': 1}}
 
     for elem in words:
 
@@ -89,17 +96,27 @@ if __name__ == '__main__':
             accuracies.append(accuracy_score(y_test_pra, predictions))
             # print(classification_report(y_test_pra, predictions))
             report = classification_report(y_test_pra, predictions, output_dict=True)
-            # print(report)
-            precision, recall, fscore, support = score(y_test_pra, predictions,average='macro')
-            precisions.append(precision)
-            recalls.append(recall)
-            fscores.append(fscore)
+            print(report)
+            for key in report.keys():
+                if key == 'accuracy':
+                    classification_reports['accuracy'] = (classification_reports['accuracy'] + report[key]) / 2
+                else:
+                    classification_reports[key]['precision'] = (classification_reports[key]['precision'] +
+                                                                report[key]['precision']) / 2
+                    classification_reports[key]['recall'] = (classification_reports[key]['recall'] +
+                                                             report[key]['recall']) / 2
+                    classification_reports[key]['f1-score'] = (classification_reports[key]['f1-score'] +
+                                                               report[key]['f1-score']) / 2
+                    classification_reports[key]['support'] = (classification_reports[key]['support'] +
+                                                              report[key]['support'])
 
-    classification_reports['Precision'] = np.mean(precisions)
-    classification_reports['Accuracy'] = np.mean(accuracies)
-    classification_reports['Recall'] = np.mean(recalls)
-    classification_reports['fscore'] = np.mean(fscores)
-    print(classification_reports)
-    # df = pd.DataFrame(classification_reports).transpose()
-    # df.to_csv('report.csv')
-
+    for key in classification_reports.keys():
+        if key == 'accuracy':
+            classification_reports['accuracy'] = round(classification_reports['accuracy'], 2)
+        else:
+            classification_reports[key]['precision'] = round(classification_reports[key]['precision'], 2)
+            classification_reports[key]['recall'] = round(classification_reports[key]['recall'], 2)
+            classification_reports[key]['f1-score'] = round(classification_reports[key]['f1-score'], 2)
+            classification_reports[key]['support'] = round(classification_reports[key]['support'], 2)
+    df = pd.DataFrame(classification_reports).transpose()
+    df.to_csv('report.csv')
