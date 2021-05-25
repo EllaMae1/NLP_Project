@@ -6,6 +6,9 @@ from nltk import bigrams
 from nltk import FreqDist
 from nltk.lm.preprocessing import padded_everygram_pipeline
 from nltk.lm import MLE
+from sklearn.metrics import confusion_matrix, classification_report
+from sklearn.metrics import precision_recall_fscore_support as score
+from sklearn.metrics import accuracy_score
 
 def process_1(x, y, n):
     start_symbol = '<s>'
@@ -121,6 +124,38 @@ def compute_score(x_test, y_test, model,n):
             else:
                 error+=1
     return correct/len(x_test), error/len(x_test), noidea/len(x_test)
+
+def predict(model, x_test, n):
+    answer = ['0']*len(x_test)
+    i=0
+    start_symbol = '<s>'
+    for index, row in x_test.iterrows():
+        line= row['line']
+        score = []
+        prior =[]
+        if ind-n+1>0:
+            s= line[ind-n+1:ind]
+        elif ind!=0:
+            s = [start_symbol]*(n-1-ind)
+            s.extend(line[0:ind])
+        else:
+            s = [start_symbol]*(n-1)
+        prior.extend(s)
+        if row['probe'] in line:
+            ind = line.index(row['probe'])
+            for j in range(1,5):
+                score.append(model.score(row['probe']+str(j),prior))
+            if sum(score) >0.0001 and score.count(max(score)) < 2:
+                answer[i]= (str)(score.index(max(score))+1)
+        elif row['probe'].capitalize() in line:
+            ind = line.index(row['probe'].capitalize())
+            for j in range(1,5):
+                score.append(model.score(row['probe']+str(j),prior))
+            if sum(score) >0.0001 and score.count(max(score)) < 2:
+                answer[i]= (str)(score.index(max(score))+1)  
+        i+=1
+    return answer
+        
 
 def get_model(x_train_clean, n):
     train_data, padded_sents = padded_everygram_pipeline(n, x_train_clean)

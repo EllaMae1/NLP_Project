@@ -24,3 +24,18 @@ class Bow():
             else:
                 wrong +=1
         return correct/len(x_test), wrong/len(x_test), noidea/len(x_test)
+    
+    def predict(self, x_test):
+        answer = ['0']*len(x_test)
+        j=0
+        for index,row in x_test.iterrows():
+            score_line =[0,0,0,0]
+            if row['probe'] in self.bow:
+                for w in row['line']:
+                    for i in range(4):
+                        if w in self.bow[row['probe']][i]:
+                            score_line[i]+=1                
+            if sum(score_line)!=0 and score_line.count(max(score_line))<2:
+                answer[j]=(str)(score_line.index(max(score_line))+1)
+            j+=1
+                
