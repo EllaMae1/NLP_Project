@@ -61,7 +61,13 @@ def compute_score(x_test, y_test, model,n):
         for index, row in x_test.iterrows():
             p=[]
             line= row['line']
-            ind = line.index(row['probe'])
+            if row['probe'] in line:
+                ind = line.index(row['probe'])
+            elif row['probe'].capitalize() in line:
+                ind = line.index(row['probe'].capitalize())
+            else:
+                error+=1
+                continue
             prior =[]
             if ind-n+1>0:
                 s= line[ind-n+1:ind]
@@ -83,9 +89,16 @@ def compute_score(x_test, y_test, model,n):
     else:
         for index, row in x_test.iterrows():
             p=[]
+            skip = False
             for i in range(4):
                 line = row['line']
-                ind = line.index(row['probe'])
+                if row['probe'] in line:
+                    ind = line.index(row['probe'])
+                elif row['probe'].capitalize() in line:
+                    ind = line.index(row['probe'].capitalize())
+                else:
+                    skip = True
+                    continue
                 prior =[]
                 if ind-n+1>0:
                     s= line[ind-n+1:ind]
@@ -98,6 +111,9 @@ def compute_score(x_test, y_test, model,n):
                     s = [start_symbol]*(n-1)
                     prior.extend(s)
                 p.append(model.score(row['probe']+str(i+1),prior))
+            if skip:
+                error += 1
+                continue
             if sum(p)<0.00001:
                 noidea+=1
             elif y_test.loc[index][0].isnumeric() and p.index(max(p))+1 == (int)(y_test.loc[index][0]):
