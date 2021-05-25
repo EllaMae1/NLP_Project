@@ -129,31 +129,58 @@ def predict(model, x_test, n):
     answer = ['0']*len(x_test)
     i=0
     start_symbol = '<s>'
-    for index, row in x_test.iterrows():
-        line= row['line']
-        score = []
-        prior =[]
-        if ind-n+1>0:
-            s= line[ind-n+1:ind]
-        elif ind!=0:
-            s = [start_symbol]*(n-1-ind)
-            s.extend(line[0:ind])
-        else:
-            s = [start_symbol]*(n-1)
-        prior.extend(s)
-        if row['probe'] in line:
-            ind = line.index(row['probe'])
-            for j in range(1,5):
-                score.append(model.score(row['probe']+str(j),prior))
-            if sum(score) >0.0001 and score.count(max(score)) < 2:
-                answer[i]= (str)(score.index(max(score))+1)
-        elif row['probe'].capitalize() in line:
-            ind = line.index(row['probe'].capitalize())
-            for j in range(1,5):
-                score.append(model.score(row['probe']+str(j),prior))
-            if sum(score) >0.0001 and score.count(max(score)) < 2:
-                answer[i]= (str)(score.index(max(score))+1)  
-        i+=1
+    if isinstance(model, list):
+        for index, row in x_test.iterrows():
+            line= row['line']
+            score = []
+            prior =[]
+            if ind-n+1>0:
+                s= line[ind-n+1:ind]
+            elif ind!=0:
+                s = [start_symbol]*(n-1-ind)
+                s.extend(line[0:ind])
+            else:
+                s = [start_symbol]*(n-1)
+            prior.extend(s)
+            if row['probe'] in line:
+                ind = line.index(row['probe'])
+                for j in range(4):
+                    score.append(model[j].score(row['probe']+str(j+1),prior))
+                if sum(score) >0.0001 and score.count(max(score)) < 2:
+                    answer[i]= (str)(score.index(max(score))+1)
+            elif row['probe'].capitalize() in line:
+                ind = line.index(row['probe'].capitalize())
+                for j in range(4):
+                    score.append(model[j].score(row['probe']+str(j+1),prior))
+                if sum(score) >0.0001 and score.count(max(score)) < 2:
+                    answer[i]= (str)(score.index(max(score))+1)  
+            i+=1
+    else:
+        for index, row in x_test.iterrows():
+            line= row['line']
+            score = []
+            prior =[]
+            if ind-n+1>0:
+                s= line[ind-n+1:ind]
+            elif ind!=0:
+                s = [start_symbol]*(n-1-ind)
+                s.extend(line[0:ind])
+            else:
+                s = [start_symbol]*(n-1)
+            prior.extend(s)
+            if row['probe'] in line:
+                ind = line.index(row['probe'])
+                for j in range(1,5):
+                    score.append(model.score(row['probe']+str(j),prior))
+                if sum(score) >0.0001 and score.count(max(score)) < 2:
+                    answer[i]= (str)(score.index(max(score))+1)
+            elif row['probe'].capitalize() in line:
+                ind = line.index(row['probe'].capitalize())
+                for j in range(1,5):
+                    score.append(model.score(row['probe']+str(j),prior))
+                if sum(score) >0.0001 and score.count(max(score)) < 2:
+                    answer[i]= (str)(score.index(max(score))+1)  
+            i+=1
     return answer
         
 
