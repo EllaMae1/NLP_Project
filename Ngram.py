@@ -147,6 +147,8 @@ def predict(model, x_test, n):
                     score.append(model[j].score(row['probe']+str(j+1),prior))
                 if sum(score) >0.0001 and score.count(max(score)) < 2:
                     answer.at[index, 0]= (str)(score.index(max(score))+1)
+                else:
+                    answer.at[index, 0]='0'
             elif row['probe'].capitalize() in line:
                 ind = line.index(row['probe'].capitalize())
                 prior =[]
@@ -161,8 +163,9 @@ def predict(model, x_test, n):
                 for j in range(4):
                     score.append(model[j].score(row['probe']+str(j+1),prior))
                 if sum(score) >0.0001 and score.count(max(score)) < 2:
-                    answer.at[index, 0]= (str)(score.index(max(score))+1)  
-            i+=1
+                    answer.at[index, 0]= (str)(score.index(max(score))+1)
+                else:
+                    answer.at[index,0]='0'
     else:
         for index, row in x_test.iterrows():
             line= row['line']
@@ -182,6 +185,8 @@ def predict(model, x_test, n):
                     score.append(model.score(row['probe']+str(j),prior))
                 if sum(score) >0.0001 and score.count(max(score)) < 2:
                     answer.at[index, 0]= (str)(score.index(max(score))+1)
+                else:
+                    answer.at[index, 0]= '0'
             elif row['probe'].capitalize() in line:
                 ind = line.index(row['probe'].capitalize())
                 prior =[]
@@ -197,7 +202,8 @@ def predict(model, x_test, n):
                     score.append(model.score(row['probe']+str(j),prior))
                 if sum(score) >0.0001 and score.count(max(score)) < 2:
                     answer.at[index, 0]= (str)(score.index(max(score))+1)  
-            i+=1
+                else:
+                    answer.at[index, 0]= '0'
     return answer
         
 

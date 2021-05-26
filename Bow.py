@@ -37,4 +37,6 @@ class Bow():
                             score_line[i]+=1                
             if sum(score_line)!=0 and score_line.count(max(score_line))<2:
                 answer.at[index, 0]=(str)(score_line.index(max(score_line))+1)
+            else:
+                answer.at[index, 0]= '0'
         return answer
