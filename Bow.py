@@ -28,7 +28,6 @@ class Bow():
     
     def predict(self, x_test):
         answer = pd.DataFrame(index = x_test.index, columns=[0])
-        j=0
         for index,row in x_test.iterrows():
             score_line =[0,0,0,0]
             if row['probe'] in self.bow:
@@ -38,5 +37,4 @@ class Bow():
                             score_line[i]+=1                
             if sum(score_line)!=0 and score_line.count(max(score_line))<2:
                 answer.at[index, 0]=(str)(score_line.index(max(score_line))+1)
-            j+=1
-                
+        return answer
