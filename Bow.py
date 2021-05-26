@@ -1,3 +1,4 @@
+import pandas as pd
 class Bow():
     def __init__(self, x_train, y_train):
         self.bow = {}
@@ -26,7 +27,7 @@ class Bow():
         return correct/len(x_test), wrong/len(x_test), noidea/len(x_test)
     
     def predict(self, x_test):
-        answer = ['0']*len(x_test)
+        answer = pd.DataFrame(index = x_test.index, columns=[0])
         j=0
         for index,row in x_test.iterrows():
             score_line =[0,0,0,0]
@@ -36,6 +37,6 @@ class Bow():
                         if w in self.bow[row['probe']][i]:
                             score_line[i]+=1                
             if sum(score_line)!=0 and score_line.count(max(score_line))<2:
-                answer[j]=(str)(score_line.index(max(score_line))+1)
+                answer.at[index, 0]=(str)(score_line.index(max(score_line))+1)
             j+=1
                 
